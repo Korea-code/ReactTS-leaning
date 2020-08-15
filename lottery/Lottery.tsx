@@ -58,13 +58,13 @@ const Lottery: FunctionComponent<{}> = () => {
     return () => intervalId.current.forEach((id) => clearTimeout(id));
   }, [intervalId.current]);
 
-  const reSelectNumbers = () => {
+  const reSelectNumbers = useCallback(() => {
     setWinNumbers(getNumbers());
     setShowingNumbers([]);
     setRedo(false);
     intervalId.current.forEach((id) => clearTimeout(id));
     intervalId.current = [];
-  };
+  }, [redo]);
 
   return (
     <Container>
