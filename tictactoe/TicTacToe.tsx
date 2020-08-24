@@ -1,9 +1,9 @@
-import React, { useCallback, useReducerti, useEffect } from "react";
+import React, { useCallback, useReducer, useEffect } from "react";
 import styled from "styled-components";
 import Table from "./Table";
 
 interface TicTacToeState {
-  winner: "O" | "X" | "";
+  winner: "O" | "X" | "tie" | "";
   turn: "O" | "X";
   tableData: string[][];
   recentCell: [number, number];
@@ -44,7 +44,11 @@ interface ChangeTurnAction {
 }
 interface ResetGameAction {
   type: typeof RESET_GAME;
+  winner: "O" | "X" | "tie";
 }
+const resetGame = (winner: "O" | "X" | "tie"): ResetGameAction => {
+  return { type: RESET_GAME, winner };
+};
 type ReducerActions =
   | SetWinnerAction
   | ClickCellAction
@@ -76,7 +80,7 @@ const reducer = (
       };
     case RESET_GAME:
       return {
-        winner: "",
+        winner: action.winner,
         turn: "O",
         tableData: [
           ["", "", ""],
@@ -93,14 +97,68 @@ const reducer = (
 const TicTacToe = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { winner, turn, tableData, recentCell } = state;
-
-  const onClickTable = () => {
-    console.log("a");
-  };
+  useEffect(() => {
+    const [row, column] = recentCell;
+    if (row < 0) {
+      return;
+    }
+    let win = false;
+    if (
+      tableData[row][0] === turn &&
+      tableData[row][1] === turn &&
+      tableData[row][2] === turn
+    ) {
+      win = true;
+    }
+    if (
+      tableData[0][column] === turn &&
+      tableData[1][column] === turn &&
+      tableData[2][column] === turn
+    ) {
+      win = true;
+    }
+    if (
+      tableData[0][0] === turn &&
+      tableData[1][1] === turn &&
+      tableData[2][2] === turn
+    ) {
+      win = true;
+    }
+    if (
+      tableData[0][2] === turn &&
+      tableData[1][1] === turn &&
+      tableData[2][0] === turn
+    ) {
+      win = true;
+    }
+    if (win) {
+      dispatch(setWinner(turn));
+      dispatch(resetGame(turn));
+    } else {
+      let tie = true;
+      tableData.forEach((row) => {
+        row.forEach((column) => {
+          if (!column) {
+            tie = false;
+          }
+        });
+      });
+      if (tie) {
+        dispatch(resetGame("tie"));
+      } else {
+        dispatch({ type: CHANGE_TURN });
+      }
+    }
+  }, [recentCell]);
   return (
     <>
-      <Table onClick={onClickTable} tableData={tableData} dispatch={dispatch} />
-      {winner && <div>winner is {winner}</div>}
+      <Table tableData={tableData} dispatch={dispatch} />
+      {winner &&
+        (winner !== "tie" ? (
+          <div>Winner is {winner}</div>
+        ) : (
+          <div>Tie game</div>
+        ))}
     </>
   );
 };

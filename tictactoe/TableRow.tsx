@@ -17,7 +17,7 @@ const TableRow: FunctionComponent<Props> = ({
       {Array(rowData.length)
         .fill(null)
         .map((td, idx) => {
-          useMemo(
+          return useMemo(
             () => (
               <TableColumn
                 key={idx}

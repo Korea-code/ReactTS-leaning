@@ -5,7 +5,6 @@ import TableRow from "./TableRow";
 interface Props {
   tableData: string[][];
   dispatch: Dispatch<any>;
-  onClick: () => void;
 }
 const Table: FunctionComponent<Props> = ({ tableData, dispatch }) => {
   return (
@@ -13,7 +12,7 @@ const Table: FunctionComponent<Props> = ({ tableData, dispatch }) => {
       {Array(tableData.length)
         .fill(null)
         .map((tr, idx) => {
-          useMemo(
+          return useMemo(
             () => (
               <TableRow
                 key={idx}
